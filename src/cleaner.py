@@ -42,9 +42,19 @@ def clean_body(raw_body: str) -> str:
 
 def normalize_subject(subject: str) -> str:
     """
-    Normalize the subject line by removing 'Re:', 'Fwd:', etc.
+    Normalize the subject line by removing prefixes like 'Re:', 'Fwd:', etc.
     """
-    return subject
+    if not subject:
+        return ""
+
+    # Regular expression to remove common prefixes
+    cleaned = re.sub(r'^(Re|Fwd|FW)(\[\d+\])?:\s*', '', subject, flags=re.IGNORECASE)
+
+    # Repeat in case of multiple nested prefixes (e.g. Re: Fwd: Re: Subject)
+    while re.match(r'^(Re|Fwd|FW)(\[\d+\])?:\s*', cleaned, flags=re.IGNORECASE):
+        cleaned = re.sub(r'^(Re|Fwd|FW)(\[\d+\])?:\s*', '', cleaned, flags=re.IGNORECASE)
+
+    return cleaned.strip()
 
 
 def is_quoted_line(line: str) -> bool:
