@@ -10,7 +10,7 @@ def extract_headers(raw_email: str) -> dict:
     Extract basic headers like From, To, Subject, and Date from a raw email string.
     """
     msg = message_from_string(raw_email, policy=policy.default)
-    
+   
     return {
         "From": msg.get("From", ""),
         "To": msg.get("To", ""),
@@ -18,14 +18,27 @@ def extract_headers(raw_email: str) -> dict:
         "Date": msg.get("Date", ""),
     }
 
-
 def clean_body(raw_body: str) -> str:
     """
     Remove email signatures and quoted replies from the body text.
     """
-    # Placeholder return
-    return raw_body
+    lines = raw_body.strip().splitlines()
+    cleaned_lines = []
 
+    for line in lines:
+        stripped = line.strip()
+
+        # Skip quoted lines
+        if stripped.startswith('>'):
+            continue
+
+        # Stop at common signature marker
+        if stripped == "--":
+            break
+
+        cleaned_lines.append(stripped)
+
+    return "\n".join(cleaned_lines).strip()
 
 def normalize_subject(subject: str) -> str:
     """
