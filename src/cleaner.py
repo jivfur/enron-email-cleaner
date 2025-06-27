@@ -65,6 +65,8 @@ def is_quoted_line(line: str) -> bool:
 
 def build_thread_key(subject: str, iso_date: str) -> str:
     """
-    Return a consistent key for grouping emails into threads, based on subject and date.
+    Return a consistent key for grouping emails into threads,
+    based on normalized subject and date.
     """
-    return f"{subject.lower()}::{iso_date}"
+    normalized_subject = normalize_subject(subject).lower()
+    return f"{normalized_subject}::{iso_date}"
