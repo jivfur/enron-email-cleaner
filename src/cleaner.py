@@ -2,19 +2,20 @@
 
 import re
 from datetime import datetime
-from email import message_from_string
+from email import message_from_string, policy
 
 
 def extract_headers(raw_email: str) -> dict:
     """
-    Extract basic headers like From, To, Subject, Date from a raw email string.
+    Extract basic headers like From, To, Subject, and Date from a raw email string.
     """
-    # Placeholder return
+    msg = message_from_string(raw_email, policy=policy.default)
+    
     return {
-        "From": "",
-        "To": "",
-        "Subject": "",
-        "Date": "",
+        "From": msg.get("From", ""),
+        "To": msg.get("To", ""),
+        "Subject": msg.get("Subject", ""),
+        "Date": msg.get("Date", ""),
     }
 
 
