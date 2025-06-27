@@ -61,8 +61,7 @@ def is_quoted_line(line: str) -> bool:
     """
     Determine if a line in the email body is a quoted reply (starts with '>').
     """
-    return False
-
+    return line.strip().startswith(">")
 
 def build_thread_key(subject: str, iso_date: str) -> str:
     """
