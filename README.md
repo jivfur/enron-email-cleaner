@@ -40,6 +40,15 @@ Each mailbox folder contains subfolders with `.txt` files — one per email.
 > 📌 *This repository focuses on preprocessing only. It does not include any machine learning or modeling components.*
 
 ---
+### 📦 Installation
+
+It's recommended to use a virtual environment:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+---
 
 ## 📦 Requirements
 
