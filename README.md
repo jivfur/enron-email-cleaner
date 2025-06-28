@@ -64,6 +64,51 @@ pip install -r requirements.txt
 - Building sentiment analysis datasets with context
 - Training lightweight models for email classification
 - Teaching and experimentation with real-world communication data
+---
+### 🔄 Batch Processing Enron Emails
+
+This project includes a utility script to process a folder of raw Enron-style email files (plain `.txt` format with headers and body) and convert them into a structured, cleaned format suitable for downstream tasks like sentiment analysis or thread reconstruction.
+
+#### 🛠 How It Works
+
+- Parses headers (`From`, `To`, `Subject`, `Date`)
+- Cleans the body (removes signatures and quoted replies)
+- Normalizes subject for threading
+- Generates a consistent `ThreadKey` using subject + date
+- Tracks the source filename
+
+#### 📂 Folder Structure (Example)
+
+```bash
+data/enron-emails/
+├── email1.txt
+├── email2.txt
+...
+```
+
+#### 🚀 How to Run
+
+Run the script directly:
+
+```bash
+python process_enron_folder.py
+```
+
+Or import into another script or notebook:
+
+```python
+from process_enron_folder import process_enron_folder
+
+emails = process_enron_folder("data/enron-emails")
+
+# Optionally save output
+import json
+with open("cleaned_emails.json", "w", encoding="utf-8") as f:
+    json.dump(emails, f, indent=2)
+```
+ - Emails with encoding issues are skipped with a warning.
+ - This version ignores attachments and non-standard MIME formats.
+ - Outputs a list of dictionaries, each representing a cleaned email with metadata.
 
 ---
 
