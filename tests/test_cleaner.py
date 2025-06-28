@@ -5,10 +5,13 @@ from src.cleaner import (
     normalize_subject,
     is_quoted_line,
     build_thread_key,
-    parse_email_file,
+    parse_email_file
 )
 
 def test_extract_headers_from_email():
+    """
+    test extract headers from email, creates the raw email and get the headers
+    """
     raw_email = (
         "From: alice@example.com\n"
         "To: bob@example.com\n"
@@ -23,6 +26,9 @@ def test_extract_headers_from_email():
     assert "Date" in headers
 
 def test_clean_body_removes_signature_and_quoted():
+    """
+    removes signatures and quoted. quoted means if it's a response or forwarded email
+    """
     raw_body = (
         "Hi team,\n\n"
         "Here's the update.\n\n"
@@ -35,6 +41,9 @@ def test_clean_body_removes_signature_and_quoted():
     assert "update" in cleaned
 
 def test_normalize_subject_removes_reply_and_forward():
+    """
+    test removes extra Fwd and RE
+    """
     subj = "Fwd: Re: RE: Urgent Request"
     cleaned = normalize_subject(subj)
     assert cleaned == "Urgent Request"
@@ -53,13 +62,22 @@ def test_normalize_subject_removes_reply_and_forward():
     (None, ""),
 ])
 def test_normalize_subject(raw, expected):
+    """
+    test different normalizations
+    """
     assert normalize_subject(raw) == expected
 
 def test_is_quoted_line():
+    """
+    determine if the line is quoted or not
+    """
     assert is_quoted_line("> Hello there!") is True
     assert is_quoted_line("This is not quoted.") is False
 
 def test_build_thread_key_consistent():
+    """
+    test if the email is part of the email thread
+    """
     subj = "RE: Meeting on Friday"
     date = "2001-04-05T09:30:00"
     key1 = build_thread_key(subj, date)
@@ -67,6 +85,9 @@ def test_build_thread_key_consistent():
     assert key1 == key2
 
 def test_parse_email_file_creates_clean_dict(tmp_path):
+    """
+    test the parsing can be done in eml files
+    """
     # Fake raw email content
     raw_email = (
         "From: alice@example.com\n"
