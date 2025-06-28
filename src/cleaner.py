@@ -1,8 +1,11 @@
 # src/cleaner.py
 
 import re
+import os
 from datetime import datetime
 from email import message_from_string, policy
+from email.parser import BytesParser
+
 
 
 def extract_headers(raw_email: str) -> dict:
@@ -70,3 +73,37 @@ def build_thread_key(subject: str, iso_date: str) -> str:
     """
     normalized_subject = normalize_subject(subject).lower()
     return f"{normalized_subject}::{iso_date}"
+
+
+def parse_email_file(filepath: str) -> dict:
+    """
+    Parse a .eml file and return a cleaned representation with headers and cleaned body.
+    Attachments are ignored.
+    """
+    with open(filepath, 'rb') as f:
+        msg = BytesParser(policy=policy.default).parse(f)
+
+    headers = {
+        "From": msg.get("From", ""),
+        "To": msg.get("To", ""),
+        "Subject": msg.get("Subject", ""),
+        "Date": msg.get("Date", ""),
+    }
+
+    # Get plain text body (ignore HTML and attachments)
+    if msg.is_multipart():
+        parts = [part for part in msg.walk()
+                 if part.get_content_type() == 'text/plain' and not part.get_content_disposition()]
+        body = parts[0].get_content().strip() if parts else ""
+    else:
+        body = msg.get_content().strip()
+
+    # Clean the body using your existing function
+    cleaned_body = clean_body(body)
+
+    return {
+        **headers,
+        "Body": cleaned_body,
+        "ThreadKey": build_thread_key(headers["Subject"], headers["Date"]),
+        "Filename": os.path.basename(filepath),
+    }

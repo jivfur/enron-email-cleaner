@@ -5,6 +5,7 @@ from src.cleaner import (
     normalize_subject,
     is_quoted_line,
     build_thread_key,
+    parse_email_file,
 )
 
 def test_extract_headers_from_email():
@@ -38,6 +39,22 @@ def test_normalize_subject_removes_reply_and_forward():
     cleaned = normalize_subject(subj)
     assert cleaned == "Urgent Request"
 
+@pytest.mark.parametrize("raw, expected", [
+    ("Re: Hello", "Hello"),
+    ("RE: Hello", "Hello"),
+    ("Fwd: Hello", "Hello"),
+    ("FW: Hello", "Hello"),
+    ("Fwd: Re: Hello", "Hello"),
+    ("FW: RE: FWD: FW: Hello", "Hello"),
+    ("Re[2]: Hello", "Hello"),
+    ("Fwd[10]: Re: FW: Hello", "Hello"),
+    ("No prefix here", "No prefix here"),
+    ("", ""),
+    (None, ""),
+])
+def test_normalize_subject(raw, expected):
+    assert normalize_subject(raw) == expected
+
 def test_is_quoted_line():
     assert is_quoted_line("> Hello there!") is True
     assert is_quoted_line("This is not quoted.") is False
@@ -48,3 +65,28 @@ def test_build_thread_key_consistent():
     key1 = build_thread_key(subj, date)
     key2 = build_thread_key("Fwd: Re: Meeting on Friday", date)
     assert key1 == key2
+
+def test_parse_email_file_creates_clean_dict(tmp_path):
+    # Fake raw email content
+    raw_email = (
+        "From: alice@example.com\n"
+        "To: bob@example.com\n"
+        "Subject: Re: Vacation\n"
+        "Date: Mon, 12 Jun 2023 10:15:00 -0700\n"
+        "Content-Type: text/plain; charset=\"UTF-8\"\n"
+        "\n"
+        "Hi Bob,\n\nI'd like to request some PTO.\n\n-- \nAlice"
+    )
+
+    # Write to a temp file
+    email_file = tmp_path / "fake_email.eml"
+    email_file.write_bytes(raw_email.encode('utf-8'))
+
+    result = parse_email_file(str(email_file))
+
+    assert result["From"] == "alice@example.com"
+    assert result["To"] == "bob@example.com"
+    assert result["Subject"] == "Re: Vacation"
+    assert result["Body"] == "Hi Bob,\n\nI'd like to request some PTO."
+    assert result["ThreadKey"].startswith("vacation::")
+    assert result["Filename"] == "fake_email.eml"
