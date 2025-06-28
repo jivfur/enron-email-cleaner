@@ -112,6 +112,24 @@ with open("cleaned_emails.json", "w", encoding="utf-8") as f:
 
 ---
 
+## 🗂 Access the Cleaned Dataset
+
+You can download the fully processed and cleaned Enron Email Dataset directly from Kaggle, without needing to run the cleaner yourself:
+
+🔗 **[📥 Download on Kaggle](https://www.kaggle.com/datasets/jivfur/enron-emails)**
+
+This version includes:
+- Cleaned plain-text email bodies
+- Extracted metadata (`From`, `To`, `Subject`, `Date`)
+- Normalized subject lines
+- Thread keys for grouping related emails
+- Original filenames for traceability
+
+**Format**: JSON (~1 GB)  
+**Encoding**: UTF-8  
+**License**: Research use only — see disclaimer below
+---
+
 ## ⚖️ License
 
 This project is released under the MIT License. See `LICENSE` for details.
