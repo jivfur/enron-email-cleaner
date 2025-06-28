@@ -1,7 +1,7 @@
 import os
-from src.cleaner import parse_enron_email_string
-from tqdm import tqdm
 import json
+from tqdm import tqdm
+from src.cleaner import parse_enron_email_string
 
 def process_enron_folder(folder_path: str) -> list:
     """
