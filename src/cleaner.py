@@ -2,7 +2,6 @@
 
 import re
 import os
-from datetime import datetime
 from email import message_from_string, policy
 from email.parser import BytesParser
 
