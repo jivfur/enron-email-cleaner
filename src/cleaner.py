@@ -106,3 +106,22 @@ def parse_email_file(filepath: str) -> dict:
         "ThreadKey": build_thread_key(headers["Subject"], headers["Date"]),
         "Filename": os.path.basename(filepath),
     }
+
+def parse_enron_email_string(raw_email: str, filename: str = "") -> dict:
+    """
+    Parse a raw Enron email string (not .eml) into cleaned fields.
+    """
+    headers = extract_headers(raw_email)
+
+    # Split header and body using double newline as separator
+    parts = raw_email.split("\n\n", 1)
+    body = parts[1] if len(parts) > 1 else ""
+
+    cleaned_body = clean_body(body)
+
+    return {
+        **headers,
+        "Body": cleaned_body,
+        "ThreadKey": build_thread_key(headers["Subject"], headers["Date"]),
+        "Filename": filename,
+    }

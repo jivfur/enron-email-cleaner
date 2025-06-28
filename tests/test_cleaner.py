@@ -5,7 +5,8 @@ from src.cleaner import (
     normalize_subject,
     is_quoted_line,
     build_thread_key,
-    parse_email_file
+    parse_email_file,
+    parse_enron_email_string
 )
 
 def test_extract_headers_from_email():
@@ -111,3 +112,23 @@ def test_parse_email_file_creates_clean_dict(tmp_path):
     assert result["Body"] == "Hi Bob,\n\nI'd like to request some PTO."
     assert result["ThreadKey"].startswith("vacation::")
     assert result["Filename"] == "fake_email.eml"
+
+
+def test_parse_enron_email_string_parses_correctly():
+    raw_email = (
+        "From: john.arnold@enron.com\n"
+        "To: slafontaine@globalp.com\n"
+        "Subject: re:spreads\n"
+        "Date: Wed, 13 Dec 2000 13:09:00 -0800 (PST)\n"
+        "\n"
+        "this is a test body\n\n-- \nsignature line\n> quoted reply"
+    )
+
+    result = parse_enron_email_string(raw_email, filename="email1.txt")
+
+    assert result["From"] == "john.arnold@enron.com"
+    assert result["To"] == "slafontaine@globalp.com"
+    assert result["Subject"] == "re:spreads"
+    assert result["Body"] == "this is a test body"
+    assert result["ThreadKey"].startswith("spreads::")
+    assert result["Filename"] == "email1.txt"
