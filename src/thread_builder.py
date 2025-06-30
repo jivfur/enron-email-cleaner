@@ -93,12 +93,18 @@ def _safe_date_parse(date_str: str) -> datetime:
     except Exception as e:
         print(f"Error: {e}")
         return datetime.min
-
+ 
 def hash_email(email: dict) -> str:
+    """
+    creates the hash for the email
+    """
     key_str = f"{email.get('From','')}|{email.get('To','')}|{email.get('Subject','')}|{email.get('Date','')}|{email.get('Body','')}"
     return hashlib.sha256(key_str.encode('utf-8')).hexdigest()
 
 def deduplicate_threads(thread_map: dict) -> dict:
+    """
+    remove the repeated emails
+    """
     cleaned_thread_map = {}
     for thread_id, emails in thread_map.items():
         seen_hashes = set()
