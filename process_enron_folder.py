@@ -29,7 +29,7 @@ def process_enron_folder(folder_path: str) -> list:
 
 
 
-emails = process_enron_folder("/maildir/")
+emails = process_enron_folder("/Users/ivanfuentes/Desktop/maildir/")
 
 # Optionally save as JSON
 with open("cleaned_enron_emails.json", "w", encoding="utf-8") as f:
