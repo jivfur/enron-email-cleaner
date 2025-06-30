@@ -11,20 +11,24 @@ from src.cleaner import (
 
 def test_extract_headers_from_email():
     """
-    test extract headers from email, creates the raw email and get the headers
+    Test extract_headers from a raw email string, including optional headers.
     """
     raw_email = (
         "From: alice@example.com\n"
         "To: bob@example.com\n"
         "Subject: Re: Meeting Notes\n"
-        "Date: Mon, 3 Apr 2001 10:15:00 -0700\n\n"
+        "Date: Tue, 03 Apr 2001 10:15:00 -0700\n"
+        "Message-ID: <12345@example.com>\n"
+        "In-Reply-To: <67890@example.com>\n\n"
         "Let's meet today."
     )
     headers = extract_headers(raw_email)
     assert headers['From'] == "alice@example.com"
     assert headers['To'] == "bob@example.com"
     assert headers['Subject'] == "Re: Meeting Notes"
-    assert "Date" in headers
+    assert headers['Date'] == "Tue, 03 Apr 2001 10:15:00 -0700"
+    assert headers['MessageID'] == "<12345@example.com>"
+    assert headers['InReplyTo'] == "<67890@example.com>"
 
 def test_clean_body_removes_signature_and_quoted():
     """

@@ -14,8 +14,10 @@ def extract_headers(raw_email: str) -> dict:
     msg = message_from_string(raw_email, policy=policy.default)
    
     return {
+        "MessageID": msg.get("Message-ID", ""),
         "From": msg.get("From", ""),
         "To": msg.get("To", ""),
+        "InReplyTo": msg.get("In-Reply-To", ""),
         "Subject": msg.get("Subject", ""),
         "Date": msg.get("Date", ""),
     }
