@@ -1,7 +1,8 @@
+import uuid
 from collections import defaultdict
 from datetime import datetime
 from typing import List, Dict
-import uuid
+from tqdm import tqdm
 
 from src.cleaner import normalize_subject  # Assumes normalize_subject is available
 
@@ -38,7 +39,11 @@ def build_thread_map(emails: List[dict]) -> Dict[str, List[dict]]:
             thread_ids[e["MessageID"]] = thread_id
 
     # First pass: assign thread IDs via In-Reply-To
-    for email in emails:
+    for email in tqdm(emails, desc="Building thread map"):
+        # Skip emails missing any essential header
+        if not all(email.get(field) for field in ["From", "To", "Subject", "Date"]):
+            continue
+
         msg_id = email.get("MessageID")
         if msg_id in thread_ids:
             continue  # already handled in a chain
@@ -70,7 +75,6 @@ def build_thread_map(emails: List[dict]) -> Dict[str, List[dict]]:
         for i, email in enumerate(thread):
             email["ThreadPosition"] = i
     return thread_map
-
 
 
 def _safe_date_parse(date_str: str):
