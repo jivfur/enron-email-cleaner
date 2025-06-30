@@ -1,10 +1,11 @@
 import uuid
 import hashlib
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime,timezone
 from typing import List, Dict
 from tqdm import tqdm
 
+from email.utils import parsedate_to_datetime
 from src.cleaner import normalize_subject  # Assumes normalize_subject is available
 
 def build_thread_map(emails: List[dict]) -> Dict[str, List[dict]]:
@@ -74,6 +75,7 @@ def build_thread_map(emails: List[dict]) -> Dict[str, List[dict]]:
         thread_map[thread_id].append(email)
 
     # Sort and assign ThreadPosition
+    print("HERE")
     for thread in thread_map.values():
         thread.sort(key=lambda e: _safe_date_parse(e.get("Date")))
         for i, email in enumerate(thread):
@@ -82,10 +84,14 @@ def build_thread_map(emails: List[dict]) -> Dict[str, List[dict]]:
     return (deduplicate_threads(thread_map))
 
 
-def _safe_date_parse(date_str: str):
+def _safe_date_parse(date_str: str) -> datetime:
     try:
-        return datetime.fromisoformat(date_str)
-    except Exception:
+        dt = parsedate_to_datetime(date_str)
+        if dt.tzinfo is not None:
+            dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        return dt
+    except Exception as e:
+        print(f"Error: {e}")
         return datetime.min
 
 def hash_email(email: dict) -> str:
