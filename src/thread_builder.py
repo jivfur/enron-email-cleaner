@@ -64,7 +64,10 @@ def build_thread_map(emails: List[dict]) -> Dict[str, List[dict]]:
             thread_ids[msg_id] = heuristic_threads[key]
 
     # Second pass: assign and group
-    for email in emails:
+    for email in tqdm(emails, desc="Building thread map Second Round"):
+        # Skip emails missing any essential header
+        if not all(email.get(field) for field in ["From", "To", "Subject", "Date"]):
+            continue
         thread_id = thread_ids.get(email.get("MessageID"))
         email["ThreadID"] = thread_id
         thread_map[thread_id].append(email)
