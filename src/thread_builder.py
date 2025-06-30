@@ -1,4 +1,5 @@
 import uuid
+import hashlib
 from collections import defaultdict
 from datetime import datetime
 from typing import List, Dict
@@ -77,7 +78,8 @@ def build_thread_map(emails: List[dict]) -> Dict[str, List[dict]]:
         thread.sort(key=lambda e: _safe_date_parse(e.get("Date")))
         for i, email in enumerate(thread):
             email["ThreadPosition"] = i
-    return thread_map
+    
+    return (deduplicate_threads(thread_map))
 
 
 def _safe_date_parse(date_str: str):
@@ -85,3 +87,20 @@ def _safe_date_parse(date_str: str):
         return datetime.fromisoformat(date_str)
     except Exception:
         return datetime.min
+
+def hash_email(email: dict) -> str:
+    key_str = f"{email.get('From','')}|{email.get('To','')}|{email.get('Subject','')}|{email.get('Date','')}|{email.get('Body','')}"
+    return hashlib.sha256(key_str.encode('utf-8')).hexdigest()
+
+def deduplicate_threads(thread_map: dict) -> dict:
+    cleaned_thread_map = {}
+    for thread_id, emails in thread_map.items():
+        seen_hashes = set()
+        unique_emails = []
+        for email in emails:
+            h = hash_email(email)
+            if h not in seen_hashes:
+                seen_hashes.add(h)
+                unique_emails.append(email)
+        cleaned_thread_map[thread_id] = unique_emails
+    return cleaned_thread_map
