@@ -75,7 +75,6 @@ def build_thread_map(emails: List[dict]) -> Dict[str, List[dict]]:
         thread_map[thread_id].append(email)
 
     # Sort and assign ThreadPosition
-    print("HERE")
     for thread in thread_map.values():
         thread.sort(key=lambda e: _safe_date_parse(e.get("Date")))
         for i, email in enumerate(thread):
