@@ -4,6 +4,7 @@ import re
 import os
 from email import message_from_string, policy
 from email.parser import BytesParser
+from bs4 import BeautifulSoup
 
 
 
@@ -24,9 +25,13 @@ def extract_headers(raw_email: str) -> dict:
 
 def clean_body(raw_body: str) -> str:
     """
-    Remove email signatures and quoted replies from the body text.
+    Remove HTML tags, email signatures, and quoted replies from the body text.
     """
-    lines = raw_body.strip().splitlines()
+    # Remove HTML if present
+    soup = BeautifulSoup(raw_body, "html.parser")
+    text = soup.get_text()
+
+    lines = text.strip().splitlines()
     cleaned_lines = []
 
     for line in lines:
@@ -43,7 +48,6 @@ def clean_body(raw_body: str) -> str:
         cleaned_lines.append(stripped)
 
     return "\n".join(cleaned_lines).strip()
-
 def normalize_subject(subject: str) -> str:
     """
     Normalize the subject line by removing prefixes like 'Re:', 'Fwd:', etc.

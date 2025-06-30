@@ -45,6 +45,32 @@ def test_clean_body_removes_signature_and_quoted():
     assert "On Mon" not in cleaned
     assert "update" in cleaned
 
+def test_clean_body_strips_html_and_quoted():
+    """
+    Test that clean_body removes HTML tags, quoted lines, and stops at signature.
+    """
+    raw_body = """
+    <html>
+      <body>
+        <p>Hello team,</p>
+        <p>Looking forward to the meeting.</p>
+        --<br>
+        John Doe<br>
+        > Quoted reply here
+      </body>
+    </html>
+    """
+
+    cleaned = clean_body(raw_body)
+    
+    assert "Hello team," in cleaned
+    assert "Looking forward to the meeting." in cleaned
+    assert "--" not in cleaned
+    assert "John Doe" not in cleaned
+    assert "Quoted reply" not in cleaned
+    assert "<p>" not in cleaned
+    assert "<html>" not in cleaned
+
 def test_normalize_subject_removes_reply_and_forward():
     """
     test removes extra Fwd and RE
